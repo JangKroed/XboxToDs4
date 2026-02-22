@@ -1,0 +1,8 @@
+{
+  "ds4_back_as_touchpad_click": true,
+  "xinput_user_index": 0,
+  "poll_hz": 1000,
+  "treat_trigger_as_button": true,
+  "trigger_button_threshold": 20,
+  "feedback_to_xinput": true
+}
