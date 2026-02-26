@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Ds4Bridge")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+07ddd591556fbd8f45f7ad08eafd640aa20c044a")]
 [assembly: System.Reflection.AssemblyProductAttribute("Ds4Bridge")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Ds4Bridge")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

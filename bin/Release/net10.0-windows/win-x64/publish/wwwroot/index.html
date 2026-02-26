@@ -1,106 +1,749 @@
 <!doctype html>
-<html>
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>DS4 Bridge</title>
-  <style>
-    body { font-family: system-ui, sans-serif; max-width: 760px; margin: 24px auto; padding: 0 16px; }
-    .row { display:flex; gap:16px; flex-wrap:wrap; }
-    .card { border:1px solid #ddd; border-radius:12px; padding:16px; flex:1; min-width:280px; }
-    label { display:flex; align-items:center; gap:8px; margin:8px 0; }
-    input[type="number"] { width: 110px; }
-    code { background:#f6f6f6; padding:2px 6px; border-radius:6px; }
-  </style>
-</head>
-<body>
-  <h1>DS4 Bridge</h1>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DS4 Bridge</title>
+    <style>
+      :root {
+        --bg: #f6f7fb;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --accent: #2563eb;
+        --accent2: #1d4ed8;
+        --good: #16a34a;
+        --bad: #ef4444;
+        --shadow: 0 10px 25px rgba(2, 6, 23, 0.08);
+        --radius: 14px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0b1220;
+          --card: #0f1a2e;
+          --text: #e5e7eb;
+          --muted: #9aa4b2;
+          --border: #22314b;
+          --accent: #3b82f6;
+          --accent2: #2563eb;
+          --shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+        }
+      }
 
-  <div class="row">
-    <div class="card">
-      <h3>Status</h3>
-      <div id="status">loading...</div>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple SD Gothic Neo",
+          "Noto Sans KR",
+          sans-serif;
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 24px auto;
+        padding: 0 16px 32px;
+      }
+      .top {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 22px;
+        letter-spacing: 0.2px;
+      }
+      .brand .sub {
+        margin-top: 6px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .toolbar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.6);
+      }
+      @media (prefers-color-scheme: dark) {
+        .pill {
+          background: rgba(15, 26, 46, 0.6);
+        }
+      }
+      select,
+      input[type="number"] {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        border-radius: 10px;
+        padding: 8px 10px;
+        outline: none;
+      }
+      select:focus,
+      input:focus {
+        border-color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 14px;
+      }
+      @media (max-width: 860px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 16px;
+      }
+      .card-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      .small {
+        font-size: 12px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+
+      .kv {
+        display: grid;
+        grid-template-columns: 160px 1fr;
+        gap: 10px 12px;
+        align-items: center;
+        margin-top: 8px;
+      }
+      .k {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .v {
+        font-family:
+          ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        display: inline-block;
+        background: var(--muted);
+        box-shadow: 0 0 0 3px rgba(100, 116, 139, 0.15);
+        margin-right: 8px;
+        vertical-align: middle;
+      }
+      .dot.ok {
+        background: var(--good);
+        box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.18);
+      }
+      .dot.bad {
+        background: var(--bad);
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.18);
+      }
+
+      .form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 260px;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px dashed rgba(148, 163, 184, 0.35);
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .row .label {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .row .label .hint {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.3;
+      }
+      .controls {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        align-items: center;
+      }
+
+      /* switch */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 46px;
+        height: 26px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background: rgba(100, 116, 139, 0.35);
+        border: 1px solid var(--border);
+        transition: 0.18s;
+        border-radius: 999px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        top: 2px;
+        background: var(--card);
+        border: 1px solid var(--border);
+        transition: 0.18s;
+        border-radius: 999px;
+        box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+      }
+      .switch input:checked + .slider {
+        background: rgba(37, 99, 235, 0.55);
+        border-color: rgba(37, 99, 235, 0.9);
+      }
+      .switch input:checked + .slider:before {
+        transform: translateX(20px);
+        border-color: rgba(37, 99, 235, 0.7);
+      }
+
+      .poll {
+        display: grid;
+        grid-template-columns: 1fr 88px 26px;
+        gap: 10px;
+        align-items: center;
+      }
+      input[type="range"] {
+        width: 100%;
+      }
+      .btns {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        align-items: center;
+        margin-top: 8px;
+      }
+      button {
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text);
+        border-radius: 12px;
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+      button.primary {
+        background: linear-gradient(180deg, var(--accent), var(--accent2));
+        border-color: rgba(37, 99, 235, 0.8);
+        color: white;
+        font-weight: 700;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+      .toast {
+        font-size: 12px;
+        color: var(--muted);
+        min-height: 18px;
+      }
+      .foot {
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      code {
+        background: rgba(148, 163, 184, 0.18);
+        padding: 2px 6px;
+        border-radius: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <div class="brand">
+          <h1 data-i18n="title">DS4 Bridge</h1>
+          <div class="sub" data-i18n="subtitle">
+            XInput → Virtual DualShock 4 (ViGEmBus)
+          </div>
+        </div>
+
+        <div class="toolbar">
+          <div class="pill">
+            <span data-i18n="language">Language</span>
+            <select id="lang">
+              <option value="ko">한국어</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- STATUS -->
+        <div class="card">
+          <div class="card-title">
+            <span data-i18n="status">Status</span>
+            <span class="small muted" id="statusTime"></span>
+          </div>
+
+          <div class="kv" id="statusGrid">
+            <!-- filled by JS -->
+          </div>
+
+          <div class="small muted" style="margin-top: 12px">
+            <span data-i18n="localOnly">Local only</span>:
+            <code>http://127.0.0.1:47777</code>
+          </div>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="card">
+          <div class="card-title">
+            <span data-i18n="settings">Settings</span>
+            <span class="small muted" id="saveState"></span>
+          </div>
+
+          <div class="form">
+            <div class="row">
+              <div class="label">
+                <div data-i18n="xinputIndex">XInput slot</div>
+                <div class="hint" data-i18n="xinputIndexHint">
+                  0~3 중 물리 컨트롤러가 잡힌 슬롯
+                </div>
+              </div>
+              <div class="controls">
+                <select id="xinput_user_index">
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">
+                <div data-i18n="pollHz">Polling rate</div>
+                <div class="hint" data-i18n="pollHzHint">
+                  높을수록 지연이 줄지만 CPU 사용량이 늘 수 있음
+                </div>
+              </div>
+              <div class="controls" style="width: 100%">
+                <div class="poll" style="width: 100%">
+                  <input
+                    id="poll_hz_range"
+                    type="range"
+                    min="60"
+                    max="1000"
+                    step="1"
+                  />
+                  <input
+                    id="poll_hz"
+                    type="number"
+                    min="60"
+                    max="1000"
+                    step="1"
+                  />
+                  <span class="muted">Hz</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">
+                <div data-i18n="ds4BackTouch">Back → Touchpad Click</div>
+                <div class="hint" data-i18n="ds4BackTouchHint">
+                  Back(Select) 입력을 DS4 터치패드 클릭으로도 처리
+                </div>
+              </div>
+              <div class="controls">
+                <label class="switch">
+                  <input id="ds4_back_as_touchpad_click" type="checkbox" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">
+                <div data-i18n="feedbackToXinput">
+                  Forward rumble to physical
+                </div>
+                <div class="hint" data-i18n="feedbackToXinputHint">
+                  가상 DS4로 들어오는 진동을 물리 XInput 패드로 전달
+                </div>
+              </div>
+              <div class="controls">
+                <label class="switch">
+                  <input id="feedback_to_xinput" type="checkbox" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">
+                <div data-i18n="triggerAsButton">Treat triggers as buttons</div>
+                <div class="hint" data-i18n="triggerAsButtonHint">
+                  L2/R2를 디지털 버튼으로도 처리(임계값 이상)
+                </div>
+              </div>
+              <div class="controls">
+                <label class="switch">
+                  <input id="treat_trigger_as_button" type="checkbox" />
+                  <span class="slider"></span>
+                </label>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="label">
+                <div data-i18n="triggerThreshold">Trigger button threshold</div>
+                <div class="hint" data-i18n="triggerThresholdHint">
+                  0~255 (낮을수록 버튼으로 인식되기 쉬움)
+                </div>
+              </div>
+              <div class="controls">
+                <input
+                  id="trigger_button_threshold"
+                  type="number"
+                  min="0"
+                  max="255"
+                  step="1"
+                />
+              </div>
+            </div>
+
+            <div class="btns">
+              <button id="reload" type="button" data-i18n="reload">
+                Reload
+              </button>
+              <button id="save" type="button" class="primary" data-i18n="save">
+                Save
+              </button>
+            </div>
+            <div class="toast" id="toast"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="foot" data-i18n="footNote">
+        설정은 <code>config.json</code>에 저장됩니다. (브라우저 언어 선택은
+        localStorage에 저장)
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Config</h3>
-      <label>
-        <input id="ds4_back_as_touchpad_click" type="checkbox"/>
-        ds4_back_as_touchpad_click
-      </label>
+    <script>
+      const I18N = {
+        ko: {
+          title: "DS4 브릿지",
+          subtitle: "XInput → 가상 DualShock 4 (ViGEmBus)",
+          language: "언어",
+          status: "상태",
+          settings: "설정",
+          localOnly: "로컬 전용",
+          footNote:
+            "설정은 config.json에 저장됩니다. (브라우저 언어 선택은 localStorage에 저장)",
+          xinputIndex: "XInput 슬롯",
+          xinputIndexHint: "0~3 중 물리 컨트롤러가 잡힌 슬롯",
+          pollHz: "폴링 레이트",
+          pollHzHint: "높을수록 지연이 줄지만 CPU 사용량이 늘 수 있음",
+          ds4BackTouch: "Back → 터치패드 클릭",
+          ds4BackTouchHint: "Back(Select) 입력을 DS4 터치패드 클릭으로도 처리",
+          feedbackToXinput: "진동 전달",
+          feedbackToXinputHint:
+            "가상 DS4로 들어오는 진동을 물리 XInput 패드로 전달",
+          triggerAsButton: "트리거 버튼 처리",
+          triggerAsButtonHint: "L2/R2를 디지털 버튼으로도 처리(임계값 이상)",
+          triggerThreshold: "트리거 임계값",
+          triggerThresholdHint: "0~255 (낮을수록 버튼으로 인식되기 쉬움)",
+          reload: "새로고침",
+          save: "저장",
+          saved: "저장됨",
+          saveFailed: "저장 실패",
+          status_running: "실행 중",
+          status_physical: "물리 컨트롤러",
+          status_virtual: "가상 DS4",
+          status_packet: "마지막 패킷",
+          status_rumble: "진동(L/S)",
+          status_error: "오류",
+          yes: "예",
+          no: "아니오",
+          ok: "정상",
+          notOk: "비정상",
+        },
+        en: {
+          title: "DS4 Bridge",
+          subtitle: "XInput → Virtual DualShock 4 (ViGEmBus)",
+          language: "Language",
+          status: "Status",
+          settings: "Settings",
+          localOnly: "Local only",
+          footNote:
+            "Settings are saved to config.json. (Language selection is saved in localStorage)",
+          xinputIndex: "XInput slot",
+          xinputIndexHint:
+            "Pick the slot (0~3) where your controller is connected",
+          pollHz: "Polling rate",
+          pollHzHint: "Higher reduces latency but may increase CPU usage",
+          ds4BackTouch: "Back → Touchpad Click",
+          ds4BackTouchHint: "Treat Back/Select as DS4 Touchpad Click as well",
+          feedbackToXinput: "Forward rumble",
+          feedbackToXinputHint:
+            "Forward rumble from virtual DS4 to physical XInput device",
+          triggerAsButton: "Treat triggers as buttons",
+          triggerAsButtonHint:
+            "Also treat L2/R2 as digital buttons (above threshold)",
+          triggerThreshold: "Trigger threshold",
+          triggerThresholdHint: "0~255 (lower = easier to trigger)",
+          reload: "Reload",
+          save: "Save",
+          saved: "Saved",
+          saveFailed: "Save failed",
+          status_running: "Running",
+          status_physical: "Physical",
+          status_virtual: "Virtual DS4",
+          status_packet: "Last packet",
+          status_rumble: "Rumble (L/S)",
+          status_error: "Error",
+          yes: "Yes",
+          no: "No",
+          ok: "OK",
+          notOk: "Not OK",
+        },
+      };
 
-      <label>
-        XInput User Index
-        <input id="xinput_user_index" type="number" min="0" max="3"/>
-      </label>
+      function guessLang() {
+        const saved = localStorage.getItem("ds4bridge.lang");
+        if (saved === "ko" || saved === "en") return saved;
+        const nav = (navigator.language || "").toLowerCase();
+        return nav.startsWith("ko") ? "ko" : "en";
+      }
 
-      <label>
-        Poll Hz
-        <input id="poll_hz" type="number" min="60" max="1000"/>
-      </label>
+      let LANG = guessLang();
 
-      <label>
-        <input id="feedback_to_xinput" type="checkbox"/>
-        feedback_to_xinput
-      </label>
+      function t(key) {
+        return I18N[LANG] && I18N[LANG][key] ? I18N[LANG][key] : key;
+      }
 
-      <button id="save">Save</button>
-      <span id="saved"></span>
-    </div>
-  </div>
+      function applyI18n() {
+        document.documentElement.lang = LANG;
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          el.textContent = t(el.dataset.i18n);
+        });
+      }
 
-<script>
-async function getJson(url) {
-  const r = await fetch(url);
-  return await r.json();
-}
+      function fmtBool(b) {
+        return b ? t("yes") : t("no");
+      }
 
-async function putJson(url, body) {
-  const r = await fetch(url, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body)
-  });
-  return await r.json();
-}
+      function dot(ok) {
+        const cls = ok ? "dot ok" : "dot bad";
+        return `<span class="${cls}"></span>${ok ? t("ok") : t("notOk")}`;
+      }
 
-async function refresh() {
-  const s = await getJson("/api/status");
-  document.getElementById("status").innerHTML = `
-    <div>Running: <b>${s.running}</b></div>
-    <div>PhysicalConnected: <b>${s.physicalConnected}</b></div>
-    <div>VirtualConnected: <b>${s.virtualConnected}</b></div>
-    <div>LastPacketNumber: <code>${s.lastPacketNumber}</code></div>
-    <div>LastFeedback(L/S): <code>${s.lastFeedbackLarge}</code> / <code>${s.lastFeedbackSmall}</code></div>
-    <div>LastError: <code>${s.lastError ?? ""}</code></div>
-  `;
-}
+      async function getJson(url) {
+        const r = await fetch(url, { cache: "no-store" });
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        return await r.json();
+      }
 
-async function loadCfg() {
-  const c = await getJson("/api/config");
-  document.getElementById("ds4_back_as_touchpad_click").checked = !!c.ds4_back_as_touchpad_click;
-  document.getElementById("xinput_user_index").value = c.xinput_user_index ?? 0;
-  document.getElementById("poll_hz").value = c.poll_hz ?? 250;
-  document.getElementById("feedback_to_xinput").checked = !!c.feedback_to_xinput;
-}
+      async function putJson(url, body) {
+        const r = await fetch(url, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (!r.ok) throw new Error(`${r.status} ${r.statusText}`);
+        return await r.json();
+      }
 
-document.getElementById("save").addEventListener("click", async () => {
-  const body = {
-    ds4_back_as_touchpad_click: document.getElementById("ds4_back_as_touchpad_click").checked,
-    xinput_user_index: parseInt(document.getElementById("xinput_user_index").value || "0", 10),
-    poll_hz: parseInt(document.getElementById("poll_hz").value || "250", 10),
-    feedback_to_xinput: document.getElementById("feedback_to_xinput").checked,
-    treat_trigger_as_button: true,
-    trigger_button_threshold: 20
-  };
-  await putJson("/api/config", body);
-  document.getElementById("saved").textContent = "saved!";
-  setTimeout(()=>document.getElementById("saved").textContent="", 800);
-});
+      async function refreshStatus() {
+        try {
+          const s = await getJson("/api/status");
+          const grid = document.getElementById("statusGrid");
 
-loadCfg();
-refresh();
-setInterval(refresh, 500);
-</script>
-</body>
+          const err = (s.lastError ?? "").toString();
+          const errHtml = err.length
+            ? `<span class="dot bad"></span>${err}`
+            : `<span class="dot ok"></span>-`;
+
+          grid.innerHTML = `
+      <div class="k">${t("status_running")}</div><div class="v">${dot(!!s.running)}</div>
+      <div class="k">${t("status_physical")}</div><div class="v">${dot(!!s.physicalConnected)}</div>
+      <div class="k">${t("status_virtual")}</div><div class="v">${dot(!!s.virtualConnected)}</div>
+      <div class="k">${t("status_packet")}</div><div class="v">${s.lastPacketNumber ?? 0}</div>
+      <div class="k">${t("status_rumble")}</div><div class="v">${s.lastFeedbackLarge ?? 0} / ${s.lastFeedbackSmall ?? 0}</div>
+      <div class="k">${t("status_error")}</div><div class="v">${errHtml}</div>
+    `;
+
+          document.getElementById("statusTime").textContent =
+            new Date().toLocaleTimeString();
+        } catch (e) {
+          document.getElementById("statusGrid").innerHTML = `
+      <div class="k">${t("status_error")}</div>
+      <div class="v"><span class="dot bad"></span>${e && e.message ? e.message : e}</div>
+    `;
+        }
+      }
+
+      function syncPollFromRange() {
+        const r = document.getElementById("poll_hz_range");
+        document.getElementById("poll_hz").value = r.value;
+      }
+      function syncPollFromNumber() {
+        const n = document.getElementById("poll_hz");
+        let v = parseInt(n.value || "1000", 10);
+        if (isNaN(v)) v = 1000;
+        v = Math.max(60, Math.min(1000, v));
+        n.value = v;
+        document.getElementById("poll_hz_range").value = v;
+      }
+
+      async function loadCfg() {
+        const c = await getJson("/api/config");
+
+        document.getElementById("ds4_back_as_touchpad_click").checked =
+          !!c.ds4_back_as_touchpad_click;
+        document.getElementById("xinput_user_index").value = (
+          c.xinput_user_index ?? 0
+        ).toString();
+
+        const poll = c.poll_hz ?? 1000;
+        document.getElementById("poll_hz_range").value = poll;
+        document.getElementById("poll_hz").value = poll;
+
+        document.getElementById("feedback_to_xinput").checked =
+          !!c.feedback_to_xinput;
+
+        document.getElementById("treat_trigger_as_button").checked =
+          !!c.treat_trigger_as_button;
+        document.getElementById("trigger_button_threshold").value =
+          c.trigger_button_threshold ?? 20;
+
+        syncPollFromNumber();
+      }
+
+      async function saveCfg() {
+        const toast = document.getElementById("toast");
+        toast.textContent = "";
+
+        syncPollFromNumber();
+
+        const body = {
+          ds4_back_as_touchpad_click: document.getElementById(
+            "ds4_back_as_touchpad_click",
+          ).checked,
+          xinput_user_index: parseInt(
+            document.getElementById("xinput_user_index").value || "0",
+            10,
+          ),
+          poll_hz: parseInt(
+            document.getElementById("poll_hz").value || "1000",
+            10,
+          ),
+          feedback_to_xinput:
+            document.getElementById("feedback_to_xinput").checked,
+          treat_trigger_as_button: document.getElementById(
+            "treat_trigger_as_button",
+          ).checked,
+          trigger_button_threshold: parseInt(
+            document.getElementById("trigger_button_threshold").value || "20",
+            10,
+          ),
+        };
+
+        try {
+          await putJson("/api/config", body);
+          toast.textContent = t("saved");
+          setTimeout(() => (toast.textContent = ""), 900);
+        } catch (e) {
+          toast.textContent = `${t("saveFailed")}: ${e && e.message ? e.message : e}`;
+        }
+      }
+
+      document.getElementById("lang").value = LANG;
+      document.getElementById("lang").addEventListener("change", (ev) => {
+        LANG = ev.target.value;
+        localStorage.setItem("ds4bridge.lang", LANG);
+        applyI18n();
+        refreshStatus();
+      });
+
+      document.getElementById("poll_hz_range").addEventListener("input", () => {
+        syncPollFromRange();
+      });
+      document.getElementById("poll_hz").addEventListener("input", () => {
+        syncPollFromNumber();
+      });
+
+      document.getElementById("reload").addEventListener("click", async () => {
+        await loadCfg();
+        document.getElementById("toast").textContent = "";
+      });
+      document.getElementById("save").addEventListener("click", saveCfg);
+
+      applyI18n();
+      loadCfg();
+      refreshStatus();
+      setInterval(refreshStatus, 500);
+    </script>
+  </body>
 </html>

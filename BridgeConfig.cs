@@ -13,7 +13,7 @@ public sealed class BridgeConfig
 
     // 폴링 주기 (Hz)
     [JsonPropertyName("poll_hz")]
-    public int PollHz { get; set; } = 250;
+    public int PollHz { get; set; } = 1000;
 
     // 트리거를 버튼으로도 취급할지(DS4 TriggerLeft/Right 버튼)
     [JsonPropertyName("treat_trigger_as_button")]

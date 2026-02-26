@@ -345,12 +345,10 @@ C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.AssemblyInfoInputs.cache
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.AssemblyInfo.cs
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.csproj.CoreCompileInputs.cache
-C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.MvcApplicationPartsAssemblyInfo.cache
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\rjimswa.dswa.cache.json
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\rjsmrazor.dswa.cache.json
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\rjsmcshtml.dswa.cache.json
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\scopedcss\bundle\Ds4Bridge.styles.css
-C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\compressed\hthcnba12s-{0}-0jcuwbyyv3-0jcuwbyyv3.gz
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\staticwebassets.build.json
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\staticwebassets.build.json.cache
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\staticwebassets.development.json
@@ -362,3 +360,6 @@ C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.pdb
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.genruntimeconfig.cache
 C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\ref\Ds4Bridge.dll
+C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.sourcelink.json
+C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\compressed\hthcnba12s-{0}-9sezup31qe-9sezup31qe.gz
+C:\Users\JangKroed\Documents\Ds4Bridge\Ds4Bridge\obj\Release\net10.0-windows\win-x64\Ds4Bridge.MvcApplicationPartsAssemblyInfo.cache

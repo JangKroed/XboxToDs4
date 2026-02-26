@@ -251,15 +251,18 @@ sealed class Ds4BridgeWorker : BackgroundService
 
                     _state.PhysicalConnected = true;
                     _state.LastError = null;
+                    long lastSubmitTick = Environment.TickCount64;
 
                     // 변화 없으면 Submit 생략(가볍게)
-                    if (st.dwPacketNumber != lastPacket)
+                    var now = Environment.TickCount64;
+                    bool heartbeat = (now - lastSubmitTick) >= 20;
+
+                    if (st.dwPacketNumber != lastPacket || heartbeat)
                     {
                         lastPacket = st.dwPacketNumber;
-                        _state.LastPacketNumber = lastPacket;
-
                         ApplyMapping(ds4, st.Gamepad, cfg);
                         ds4.SubmitReport();
+                        lastSubmitTick = now;
                     }
 
                     // 피드백 끊김 방지(가끔 0,0이 안 오는 케이스가 있어 주기적으로 0 전송이 필요할 때도 있음)
@@ -396,27 +399,24 @@ sealed class Ds4BridgeWorker : BackgroundService
         return DualShock4DPadDirection.None;
     }
 
-    private static byte ToByteAxis(short v)
+    private static byte ToByteAxis(int v)
     {
-        // -32768..32767 -> 0..255 (중앙 128)
-        int iv = v;
-        // clamp
-        if (iv < -32768) iv = -32768;
-        if (iv > 32767) iv = 32767;
+        // XInput: -32768..32767   [oai_citation:2‡Microsoft Learn](https://learn.microsoft.com/en-us/windows/win32/api/xinput/ns-xinput-xinput_gamepad?utm_source=chatgpt.com)
+        v = Math.Clamp(v, -32768, 32767);
 
-        // scale
-        // -32768 => 0
-        // 0      => 128
-        // 32767  => 255
-        var scaled = (iv + 32768) * 255.0 / 65535.0;
-        return (byte)Math.Clamp((int)Math.Round(scaled), 0, 255);
+        // [-32768..32767] -> [0..255]
+        int value = v + 32768; // 0..65535
+
+        // 반올림 포함 변환
+        int b = (value * 255 + 32767) / 65535;
+        return (byte)Math.Clamp(b, 0, 255);
     }
 
     private static byte ToByteAxisInvertY(short v)
     {
-        // DS4는 일반적으로 위가 감소로 느껴지는 경우가 많아서 반전
-        // (필요하면 옵션으로 빼면 됨)
-        return ToByteAxis((short)-v);
+        // short.MinValue(-32768) 반전 오버플로우 방지:
+        // -(int)v 로 올려서 처리하면 -(-32768)=32768이 되고 Clamp로 32767에 맞춰짐
+        return ToByteAxis(-(int)v);
     }
 
     private static byte ReadByteProp(object obj, string propName)
